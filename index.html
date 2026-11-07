@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>فروشگاه کانفیگ</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--tx:#14213d;--mu:#667085;--bd:#e3e8f0;--ac:#2563eb;--ac2:#fff}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1420;--card:#172033;--tx:#eef2fa;--mu:#9aa6bd;--bd:#27324a;--ac:#5b8cff;--ac2:#0b1220;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Vazirmatn",Tahoma,sans-serif;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:24px;margin:8px 0 4px}h2{font-size:18px;margin:28px 0 12px}
+.sub{color:var(--mu);margin:0}
+.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px}
+.big{font-size:20px;font-weight:800}
+.meta{color:var(--mu);font-size:13px}
+.price{font-size:16px;font-weight:800;color:var(--ac);margin:4px 0 10px}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:9px 14px;background:var(--ac);color:var(--ac2);font:inherit;font-weight:600;cursor:pointer;text-decoration:none;text-align:center}
+.btn.sec{background:transparent;color:var(--tx);border:1px solid var(--bd);margin-top:6px;font-size:12px;padding:5px}
+.back{background:none;border:0;color:var(--ac);font:inherit;cursor:pointer;padding:0;margin-bottom:12px}
+.note{margin-top:28px;text-align:center;color:var(--mu)}
+.note a{color:var(--ac);font-weight:600;direction:ltr;unicode-bidi:embed}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="app"></div></div>
+<script>
+/* ============ تنظیمات: فقط این بخش رو ویرایش کن ============
+   gb   = حجم به گیگ (۰ یعنی نامحدود)
+   days = مدت به روز (۰ یعنی بدون مدت)
+   price = قیمت به تومان
+   id   = شناسه لینک اختصاصی (فقط حرف انگلیسی و عدد، تکراری نباشه)
+   لینک هر پلن: آدرس-سایت-تو/#id   مثال: https://example.com/#e10
+   برای دیدن دکمه‌ی کپی لینک‌ها، آخر آدرس سایت بنویس: ?links
+*/
+var CONFIG = {
+  shop: "فروشگاه کانفیگ",
+  tg: "Alirezat0p",
+  note: "برای بیشتر از ۲۰۰ گیگ پیام بدید:",
+  packs: [
+    {"id": "e", "name": "پک معمولی اقتصادی اندروید"},
+    {"id": "v", "name": "پک ویژه با سرعت ویژه (اندروید و iOS)"},
+    {"id": "u", "name": "پک نامحدود پرو مکس (اندروید و iOS)"},
+  ],
+  plans: [
+    {"id": "e10", "pack": "e", "gb": 10, "days": 0, "price": 80000},
+    {"id": "e20", "pack": "e", "gb": 20, "days": 0, "price": 160000},
+    {"id": "e30", "pack": "e", "gb": 30, "days": 0, "price": 180000},
+    {"id": "e40", "pack": "e", "gb": 40, "days": 0, "price": 210000},
+    {"id": "e50", "pack": "e", "gb": 50, "days": 0, "price": 300000},
+    {"id": "e100", "pack": "e", "gb": 100, "days": 0, "price": 400000},
+    {"id": "e150", "pack": "e", "gb": 150, "days": 0, "price": 700000},
+    {"id": "e200", "pack": "e", "gb": 200, "days": 0, "price": 1000000},
+    {"id": "v10", "pack": "v", "gb": 10, "days": 0, "price": 140000},
+    {"id": "v20", "pack": "v", "gb": 20, "days": 0, "price": 220000},
+    {"id": "v30", "pack": "v", "gb": 30, "days": 0, "price": 360000},
+    {"id": "v50", "pack": "v", "gb": 50, "days": 0, "price": 440000},
+    {"id": "v100", "pack": "v", "gb": 100, "days": 0, "price": 850000},
+    {"id": "v200", "pack": "v", "gb": 200, "days": 0, "price": 2000000},
+    {"id": "u1", "pack": "u", "gb": 0, "days": 30, "price": 400000},
+    {"id": "u2", "pack": "u", "gb": 0, "days": 60, "price": 600000},
+    {"id": "u3", "pack": "u", "gb": 0, "days": 90, "price": 800000},
+    {"id": "u4", "pack": "u", "gb": 0, "days": 120, "price": 1000000},
+  ]
+};
+/* ======================= پایان تنظیمات ======================= */
+
+var app=document.getElementById('app'),showLinks=/[?&]links/.test(location.search);
+var fa=function(n){return Number(n||0).toLocaleString('fa-IR')};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function dur(d){d=+d;return d%30===0?fa(d/30)+' ماهه':fa(d)+' روزه'}
+function lab(p){return (p.gb?fa(p.gb)+' گیگ':'نامحدود')+(p.days?' · '+dur(p.days):'')}
+function packOf(p){return CONFIG.packs.filter(function(k){return k.id===p.pack})[0]||{name:''}}
+function buyUrl(p){
+  var t='سلام، می‌خوام این پلن رو بخرم: '+packOf(p).name+' - '+lab(p)+' - '+Number(p.price).toLocaleString('en-US')+' تومان';
+  return 'https://t.me/'+CONFIG.tg.replace('@','')+'?text='+encodeURIComponent(t);
+}
+function render(){
+  var id=(location.hash||'').slice(1),p=CONFIG.plans.filter(function(x){return x.id===id})[0];
+  if(p){
+    app.innerHTML='<button class="back" onclick="location.hash=\'\'">← همه پلن‌ها</button><div class="card"><div class="meta">'+esc(packOf(p).name)+'</div><div class="big" style="font-size:26px">'+lab(p)+'</div><div class="price" style="font-size:20px;margin-bottom:16px">'+fa(p.price)+' تومان</div><a class="btn" href="'+buyUrl(p)+'" target="_blank" rel="noopener">ادامه خرید در تلگرام</a></div>';
+    return;
+  }
+  var h='<h1>'+esc(CONFIG.shop)+'</h1><p class="sub">پلن مورد نظرت رو انتخاب کن</p>';
+  CONFIG.packs.forEach(function(k){
+    var ps=CONFIG.plans.filter(function(x){return x.pack===k.id});if(!ps.length)return;
+    h+='<h2>'+esc(k.name)+'</h2><div class="grid">'+ps.map(function(x){
+      return '<div class="card"><div class="big">'+lab(x)+'</div><div class="price">'+fa(x.price)+' تومان</div><a class="btn" href="#'+x.id+'">خرید</a>'+(showLinks?'<button class="btn sec" data-copy="'+x.id+'">کپی لینک</button>':'')+'</div>';
+    }).join('')+'</div>';
+  });
+  h+='<p class="note">'+esc(CONFIG.note)+'<br><a href="https://t.me/'+esc(CONFIG.tg.replace('@',''))+'" target="_blank" rel="noopener">@'+esc(CONFIG.tg.replace('@',''))+'</a></p>';
+  app.innerHTML=h;
+  app.querySelectorAll('[data-copy]').forEach(function(b){b.onclick=function(){
+    var t=location.origin+location.pathname+'#'+b.dataset.copy;
+    try{navigator.clipboard.writeText(t)}catch(e){}
+    b.textContent='کپی شد ✓';
+  }});
+}
+window.addEventListener('hashchange',render);
+render();
+</script>
+</body>
+</html>
